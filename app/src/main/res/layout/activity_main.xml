@@ -2,22 +2,35 @@
 
     <TextView
         android:id="@+id/vertical_acceleration_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="296dp"
+        android:layout_height="62dp"
         android:layout_marginStart="101dp"
         android:layout_marginEnd="100dp"
         android:ems="10"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.478"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.167" />
+        app:layout_constraintVertical_bias="0.165" />
+
+    <TextView
+        android:id="@+id/flip_text"
+        android:layout_width="268dp"
+        android:layout_height="21dp"
+        android:layout_marginStart="101dp"
+        android:layout_marginEnd="100dp"
+        android:ems="10"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.396"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.261" />
 
     <TextView
         android:id="@+id/gravity_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="253dp"
+        android:layout_height="28dp"
         android:layout_marginStart="99dp"
         android:layout_marginEnd="102dp"
         android:layout_marginBottom="44dp"
@@ -26,9 +39,40 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <View android:id="@+id/patelnia" android:layout_width="160dp" android:layout_height="160dp" android:layout_marginStart="124dp" android:layout_marginTop="284dp" android:background="#42E97F" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent"/>
+    <TextView
+        android:id="@+id/margin_text"
+        android:layout_width="274dp"
+        android:layout_height="21dp"
+        android:layout_marginStart="99dp"
+        android:layout_marginEnd="102dp"
+        android:layout_marginBottom="12dp"
+        android:ems="10"
+        app:layout_constraintBottom_toTopOf="@+id/vertical_acceleration_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.543"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <View
+        android:id="@+id/patelnia"
+        android:layout_width="160dp"
+        android:layout_height="160dp"
+        android:layout_marginStart="124dp"
+        android:layout_marginTop="284dp"
+        android:background="#42E97F"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
     <View android:id="@+id/kotlet" android:layout_width="40dp" android:layout_height="40dp" android:layout_marginStart="60dp" android:layout_marginTop="48dp" android:background="#BE0542" app:layout_constraintStart_toStartOf="@id/patelnia" app:layout_constraintTop_toTopOf="@id/patelnia"/>
     <TextView android:id="@+id/wynik" android:layout_width="208dp" android:layout_height="52dp" android:layout_marginTop="68dp" android:text="" android:textSize="40dp" app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintHorizontal_bias="0.497" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@+id/patelnia" app:layout_constraintVertical_bias="0.0"/>
     <TextView android:id="@+id/strona1view" android:layout_width="84dp" android:layout_height="54dp" android:layout_marginStart="100dp" android:layout_marginTop="46dp" android:layout_marginBottom="59dp" android:text="TextView" app:layout_constraintBottom_toTopOf="@+id/patelnia" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@+id/vertical_acceleration_text" app:layout_constraintVertical_bias="0.0"/>
     <TextView android:id="@+id/strona2view" android:layout_width="86dp" android:layout_height="53dp" android:layout_marginStart="40dp" android:layout_marginTop="46dp" android:layout_marginBottom="59dp" android:text="TextView" app:layout_constraintBottom_toTopOf="@+id/patelnia" app:layout_constraintStart_toEndOf="@+id/strona1view" app:layout_constraintTop_toBottomOf="@+id/vertical_acceleration_text" app:layout_constraintVertical_bias="0.0"/>
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="177dp"
+        android:layout_height="63dp"
+        android:layout_marginTop="68dp"
+        android:text="Zakończ smażenie"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/patelnia" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,212 +1,158 @@
-package com.example.patelnia8;
+package com.example.patelnia8; // Deklaracja pakietu aplikacji
 
-import android.graphics.Color;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
-import android.os.Bundle;
-import android.util.Log;
-import android.widget.EditText;
-import android.view.View;
-import android.widget.TextView;
+import android.graphics.Color; // Import klasy do obsługi kolorów
+import android.hardware.Sensor; // Import klasy do obsługi czujników
+import android.hardware.SensorEvent; // Import klasy reprezentującej dane z czujnika
+import android.hardware.SensorEventListener; // Import interfejsu do obsługi zdarzeń z czujników
+import android.hardware.SensorManager; // Import klasy zarządzającej czujnikami
+import android.os.Bundle; // Import klasy do obsługi stanu aktywności (np. po obrocie ekranu)
+import android.util.Log; // Import klasy do logowania wiadomości w konsoli
+import android.view.View; // Import klasy do obsługi widoków UI
+import android.os.Handler; // Import klasy do obsługi opóźnionego wykonywania kodu
+import android.widget.TextView; // Import klasy do obsługi tekstu na ekranie
 
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout; // Import klasy do obsługi układu ConstraintLayout
+import androidx.appcompat.app.AppCompatActivity; // Import klasy dla głównej aktywności aplikacji
 
-public class MainActivity extends AppCompatActivity implements SensorEventListener {
+public class MainActivity extends AppCompatActivity implements SensorEventListener { // Deklaracja klasy głównej aktywności, implementuje obsługę sensorów
 
-    private SensorManager sensorManager;
-    private Sensor accelerometer;
-    private Sensor gravity;
-    private TextView verticalAccelerationText;
-    private View kotlet;
-    private View patelnia;
-    private TextView wynik;
-    private int strona1 = 0;
-    private int strona2 = 0;
-    private boolean odlicza = true;
-    private final int white = Color.parseColor("#FFFFFF");
-    private final int olive = Color.parseColor("#9BB601");
-    private TextView strona1view;
-    private TextView strona2view;
+    private SensorManager sensorManager; // Obiekt zarządzający czujnikami
+    private Sensor accelerometer; // Obiekt akcelerometru (przyspieszenie)
+    private Sensor rotationVector; // Obiekt czujnika rotacji
+    private TextView verticalAccelerationText; // Tekst wyświetlający pionowe przyspieszenie
+    private View kotlet; // Obiekt reprezentujący kotleta na ekranie
+    private TextView wynik; // Obiekt tekstowy do wyświetlania wyniku
+    private TextView gravityText; // Obiekt tekstowy do wyświetlania nachylenia telefonu
 
+    private TextView marginText;
+    private Handler gameHandler = new Handler(); // Handler do obsługi pętli gry
+    private final int FRAME_DELAY = 200; // Czas odświeżania gry (200 ms = 5 FPS)
+    private boolean isRunning = true; // Flaga wskazująca, czy gra jest uruchomiona
 
-
+    private float roll = 0; // Przechowywanie wartości nachylenia (Roll - oś Y)
+    private float pitch = 0; // Przechowywanie wartości pochylenia (Pitch - oś X)
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+    protected void onCreate(Bundle savedInstanceState) { // Metoda wywoływana przy uruchomieniu aplikacji
+        super.onCreate(savedInstanceState); // Wywołanie metody nadrzędnej
+        setContentView(R.layout.activity_main); // Ustawienie układu interfejsu
 
+        kotlet = findViewById(R.id.kotlet); // Znalezienie widoku reprezentującego kotleta
+        wynik = findViewById(R.id.wynik); // Znalezienie widoku do wyświetlania wyniku
+        verticalAccelerationText = findViewById(R.id.vertical_acceleration_text); // Znalezienie widoku do wyświetlania przyspieszenia
+        gravityText = findViewById(R.id.gravity_text); // Znalezienie widoku do wyświetlania kąta nachylenia telefonu
+        marginText = findViewById(R.id.margin_text);
 
-        kotlet = findViewById(R.id.kotlet);
-        patelnia = findViewById(R.id.patelnia);
-        wynik = findViewById(R.id.wynik);
-        verticalAccelerationText = findViewById(R.id.vertical_acceleration_text);
-        strona1view = findViewById(R.id.strona1view);
-        strona2view = findViewById(R.id.strona2view);
+        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE); // Pobranie menedżera czujników
+        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER); // Pobranie czujnika akcelerometru
+        rotationVector = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR); // Pobranie czujnika wektora rotacji
 
-
-        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        gravity = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
-
-        if (accelerometer != null) {
-            sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_GAME);
-        }else{
-            Log.e("SensorError", "Accelerometer sensor not available");
+        if (accelerometer != null) { // Sprawdzenie, czy akcelerometr jest dostępny
+            sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_GAME); // Rejestracja nasłuchiwania danych z akcelerometru
+        } else {
+            Log.e("SensorError", "Brak akcelerometru!"); // Logowanie błędu, jeśli czujnik nie jest dostępny
         }
-        if (gravity != null) {
-            sensorManager.registerListener(this, gravity, SensorManager.SENSOR_DELAY_NORMAL);
-        }else{
-            Log.e("SensorError", "Rotation vector sensor not available");
+
+        if (rotationVector != null) { // Sprawdzenie, czy czujnik wektora rotacji jest dostępny
+            sensorManager.registerListener(this, rotationVector, SensorManager.SENSOR_DELAY_GAME); // Rejestracja nasłuchiwania danych z czujnika rotacji
+        } else {
+            Log.e("SensorError", "Brak sensora wektora rotacji!"); // Logowanie błędu, jeśli czujnik nie jest dostępny
         }
+
+        startGameLoop(); // Uruchomienie pętli gry
     }
 
-    @Override
-    public void onSensorChanged(SensorEvent event) {
-        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-            float x = event.values[0];
-            float y = event.values[1];
-            float z = event.values[2];
-
-
-            float totalAcceleration = (float) Math.sqrt(x * x + y * y + z * z);
-
-            z -= 9.81f;
-            verticalAccelerationText.setText(String.format("%.2f m/s²\nTotal Acceleration: %.2f m/s²", z, totalAcceleration));
-
-
-
-            if (z > -4.0) {
-                zacznijOdliczanie();
+    private void startGameLoop() { // Metoda uruchamiająca pętlę gry
+        gameHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (isRunning) { // Sprawdzanie, czy gra powinna działać
+                    updateGame(); // Aktualizacja stanu gry (ruch kotleta)
+                    gameHandler.postDelayed(this, FRAME_DELAY); // Powtórne wywołanie po 50 ms
+                }
             }
+        }, FRAME_DELAY);
+    }
+
+    private void updateGame() { // Metoda aktualizująca stan gry
+
+        Log.d("GameUpdate", "Pitch: " + pitch + ", Roll: " + roll); // Logowanie aktualnych wartości
+
+        // Konwersja nachylenia na przesunięcie w pikselach
+        float translationX = roll * 5 * getResources().getDisplayMetrics().density;
+        float translationY = -pitch * 5 * getResources().getDisplayMetrics().density;
+
+        // Ustawienie nowej pozycji kotleta
+        kotlet.setTranslationX(translationX);
+        kotlet.setTranslationY(translationY);
+
+        // Aktualizacja wyświetlanego tekstu
+        gravityText.setText(String.format("X: %.1f, Y: %.1f", translationX, translationY));
+
+        // Sprawdzenie, czy kotlet wypadł poza patelnię
+        if (translationX < -200 || translationX > 200 || translationY < -160 || translationY > 240) {
+            wynik.setText("Przegrałeś!");
+            isRunning = false; // Zatrzymanie gry
+        } else {
+            wynik.setText("");
         }
-        if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
+    }
+    @Override
+    public void onSensorChanged(SensorEvent event) { // Obsługa zmiany wartości czujników
+        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) { // Sprawdzenie, czy to akcelerometr
+            float x = event.values[0]; // Odczytanie wartości osi X
+            float y = event.values[1]; // Odczytanie wartości osi Y
+            float z = event.values[2]; // Odczytanie wartości osi Z
+
+
+            float totalAcceleration = (float) Math.sqrt(x * x + y * y + z * z); // Obliczenie całkowitego przyspieszenia
+            totalAcceleration = z - 9.81f; // Korekta o przyciąganie ziemskie
+
+            if (totalAcceleration > 12){
+                TextView flipText = findViewById(R.id.flip_text);
+                flipText.setText("Podrzucenie!");
+
+            }
+
+            verticalAccelerationText.setText(String.format("Z: %.2f m/s²\nTotal: %.2f m/s²", z, totalAcceleration)); // Wyświetlenie wartości przyspieszenia
+        }
+
+        if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) { // Sprawdzenie, czy to czujnik rotacji
             float[] rotationMatrix = new float[9];
             float[] orientationAngles = new float[3];
 
-            // Konwersja wektora rotacji na macierz rotacji
-            SensorManager.getRotationMatrixFromVector(rotationMatrix, event.values);
+            SensorManager.getRotationMatrixFromVector(rotationMatrix, event.values); // Przekształcenie danych na macierz rotacji
+            SensorManager.getOrientation(rotationMatrix, orientationAngles); // Przekształcenie macierzy na kąty
 
-            // Obliczenie kątów orientacji
-            SensorManager.getOrientation(rotationMatrix, orientationAngles);
-
-            // Konwersja radianów na stopnie
-            int pitch = (int) Math.toDegrees(orientationAngles[1]);   // Oś X
-            int roll = (int) Math.toDegrees(orientationAngles[2]);    // Oś Y
-
-            TextView field2 = findViewById(R.id.gravity_text);
-            field2.setText(String.format("Pitch: %d.f2 Roll: %d.f2", pitch, roll));
-
-            // Wyświetlenie wartości
-            System.out.println("Pitch (Oś X): " + pitch);
-            System.out.println("Roll (Oś Y): " + roll);
-
-            ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) kotlet.getLayoutParams();
-            params.setMargins(calcMargin(roll), calcMargin(-1 * pitch), 0, 0);
-            kotlet.setLayoutParams(params);
+            pitch = (float) Math.toDegrees(orientationAngles[1]); // Konwersja na stopnie (oś X)
+            roll = (float) Math.toDegrees(orientationAngles[2]); // Konwersja na stopnie (oś Y)
         }
+        updateGame();
     }
-    public int calcMargin(int degree) {
-        int margin = (int) ((degree * 5 + 70) * getResources().getDisplayMetrics().density);
-        if (margin < -30 || margin > 350){
-            wynik.setText("Przegrałeś!");
-        }else{
-            wynik.setText("");
-        }
-        return Math.max(-31, Math.min(margin, 351)); // Ograniczenie do zakresu 0-500
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        // Nie musisz nic tutaj robić, jeśli nie zależy ci na dokładności czujnika
     }
 
+    public int calcMargin(int degree) { // Obliczanie marginesu dla kotleta
+        int margin = (int) ((degree * 2 + 25) * getResources().getDisplayMetrics().density);
+
+        marginText.setText(String.format("Margin: %d", (int) margin));
+        return Math.max(-11, Math.min(margin, 131)); // Ograniczenie marginesu do zakresu -30 do 350
+
+    }
 
     @Override
-    public void onAccuracyChanged(Sensor sensor, int i) {
-
-    }
-
-
-    @Override
-    protected void onPause() {
+    protected void onPause() { // Metoda wywoływana, gdy aplikacja przechodzi w tło
         super.onPause();
-        sensorManager.unregisterListener(this);
+        sensorManager.unregisterListener(this); // Wyrejestrowanie czujników
+        isRunning = false; // Zatrzymanie gry
     }
 
     @Override
-    protected void onResume() {
+    protected void onResume() { // Metoda wywoływana, gdy aplikacja wraca na pierwszy plan
         super.onResume();
-        if (accelerometer != null) {
-            sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
-        }
-
+        isRunning = true;
+        startGameLoop(); // Restart gry
     }
-    private void zacznijOdliczanie() {
-        for (int i = 0; i <= 15; i++){
-            if (odlicza) {
-                strona1++; // Zwiększ licznik1, jeśli flaga isCountingFirst jest true
-            } else {
-                strona2++; // Zwiększ licznik2, jeśli flaga isCountingFirst jest false
-            }
-            // Aktualizacja interfejsu użytkownika
-            strona1view.setText(String.format("Strona 1: %d", strona1));
-            strona2view.setText(String.format("Strona 2: %d", strona2));
-            try {
-                Thread.sleep(1000); // Odczekanie 1 sekundy
-            } catch (InterruptedException e) {
-                e.printStackTrace(); // Obsługa wyjątku, jeśli wątek zostanie przerwany
-            }
-        }
-    }
-
-//    @Override
-//    protected void gameStart(){
-//        onResume();
-//
-//    }
 }
-
-//private Handler handler = new Handler();
-//private Runnable counterTask;
-//private boolean odlicza = true; // Flaga określająca, który licznik zwiększać
-//private int strona1 = 0;
-//private int strona2 = 0;
-//
-//private void zacznijOdliczanie() {
-//    counterTask = new Runnable() {
-//        @Override
-//        public void run() {
-//            // Zwiększ licznik w zależności od flagi
-//            if (odlicza) {
-//                strona1++;
-//            } else {
-//                strona2++;
-//            }
-//
-//            // Aktualizacja widoków
-//            strona1view.setText(String.format("Strona 1: %d", strona1));
-//            strona2view.setText(String.format("Strona 2: %d", strona2));
-//
-//            // Zaplanowanie kolejnego wywołania po 1 sekundzie
-//            handler.postDelayed(this, 1000);
-//        }
-//    };
-//
-//    // Uruchomienie pierwszego zadania
-//    handler.post(counterTask);
-//}
-//
-//@Override
-//protected void onPause() {
-//    super.onPause();
-//    // Przerwanie odliczania przy pauzowaniu aktywności
-//    handler.removeCallbacks(counterTask);
-//}
-//
-//@Override
-//protected void onResume() {
-//    super.onResume();
-//    // Wznowienie odliczania po powrocie
-//    if (counterTask != null) {
-//        handler.post(counterTask);
-//    }
-//}
