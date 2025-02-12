@@ -62,7 +62,20 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
     <View android:id="@+id/kotlet" android:layout_width="40dp" android:layout_height="40dp" android:layout_marginStart="60dp" android:layout_marginTop="48dp" android:background="#BE0542" app:layout_constraintStart_toStartOf="@id/patelnia" app:layout_constraintTop_toTopOf="@id/patelnia"/>
-    <TextView android:id="@+id/wynik" android:layout_width="208dp" android:layout_height="52dp" android:layout_marginTop="68dp" android:text="" android:textSize="40dp" app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintHorizontal_bias="0.497" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@+id/patelnia" app:layout_constraintVertical_bias="0.0"/>
+
+    <TextView
+        android:id="@+id/wynik"
+        android:layout_width="413dp"
+        android:layout_height="75dp"
+        android:layout_marginTop="68dp"
+        android:text=""
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/patelnia"
+        app:layout_constraintVertical_bias="0.0" />
+
     <TextView android:id="@+id/strona1view" android:layout_width="84dp" android:layout_height="54dp" android:layout_marginStart="100dp" android:layout_marginTop="46dp" android:layout_marginBottom="59dp" android:text="TextView" app:layout_constraintBottom_toTopOf="@+id/patelnia" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@+id/vertical_acceleration_text" app:layout_constraintVertical_bias="0.0"/>
     <TextView android:id="@+id/strona2view" android:layout_width="86dp" android:layout_height="53dp" android:layout_marginStart="40dp" android:layout_marginTop="46dp" android:layout_marginBottom="59dp" android:text="TextView" app:layout_constraintBottom_toTopOf="@+id/patelnia" app:layout_constraintStart_toEndOf="@+id/strona1view" app:layout_constraintTop_toBottomOf="@+id/vertical_acceleration_text" app:layout_constraintVertical_bias="0.0"/>
 
@@ -70,7 +83,7 @@
         android:id="@+id/button"
         android:layout_width="177dp"
         android:layout_height="63dp"
-        android:layout_marginTop="68dp"
+        android:layout_marginTop="168dp"
         android:text="Zakończ smażenie"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
