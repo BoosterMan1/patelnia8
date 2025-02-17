@@ -11,11 +11,9 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
-import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -26,16 +24,15 @@ import java.util.Map;
 public class GameActivity extends AppCompatActivity implements SensorEventListener {
         private SensorManager sensorManager;
         private Sensor accelerometer, rotationVector;
-        private TextView verticalAccelerationText, gravityText, wynik, wynik2;
         private ImageView kotlet;
-        private Handler gameHandler = new Handler();
-        private final int FRAME_DELAY = 200;
+        private final Handler gameHandler = new Handler();
+        private final int FRAME_DELAY = 200; // opóźnienie klatek w milisekundach
         private boolean isRunning = true;
         private boolean isFlipped = false;
         private boolean flipCooldown = false;
         private boolean flipTriggered = false;
-        private float roll = 0, pitch = 0;
-        private float cookTimeSide1 = 0, cookTimeSide2 = 0;
+        private float roll = 0, pitch = 0; // przechylenie telefonu
+        private float cookTimeSide1 = 0, cookTimeSide2 = 0; // Wysmażenie z obu stron (czas)
         private float velocityX = 1, velocityY = 1; // Prędkość ruchu kotleta
         private String leftImage;
         private String rightImage;
@@ -52,6 +49,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
             endButton = findViewById(R.id.end_cooking_button);
             endButton.setOnClickListener(v -> {
+                endGame();
                 Intent intent = new Intent(this, ResultActivity.class);
                 startActivity(intent);
             });
@@ -59,10 +57,6 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
             goalLevel = getIntent().getIntExtra("goalLevel", 1);
             kotlet = findViewById(R.id.steak);
-            wynik = findViewById(R.id.wynik);
-            wynik2 = findViewById(R.id.wynik2);
-            verticalAccelerationText = findViewById(R.id.vertical_acceleration_text);
-            gravityText = findViewById(R.id.gravity_text);
             endButton = findViewById(R.id.end_cooking_button);
 
             sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
@@ -76,13 +70,6 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
             if (rotationVector != null) {
                 sensorManager.registerListener(this, rotationVector, SensorManager.SENSOR_DELAY_GAME);
             }
-
-
-
-            Button endButton = findViewById(R.id.end_cooking_button);
-            endButton.setOnClickListener(v -> {
-                endGame();
-            });
 
             startGameLoop();
         }
@@ -152,8 +139,6 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                 rightImage = "right_congratulations";
             }
 
-            wynik.setText(leftImage);
-            wynik2.setText(rightImage);
             userResultCheck();
 
 
@@ -216,7 +201,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         private void animateFlip() {
             isRunning = false; // Pauza w grze podczas animacji
 
-            // Animacje powiększania, obracania i pomniejszania – przykładowo (możesz użyć wcześniej zaproponowanego kodu)
+            // Animacje powiększania, obracania i pomniejszania
             ObjectAnimator scaleUpX = ObjectAnimator.ofFloat(kotlet, "scaleX", 1f, 1.5f);
             ObjectAnimator scaleUpY = ObjectAnimator.ofFloat(kotlet, "scaleY", 1f, 1.5f);
             scaleUpX.setDuration(300);
@@ -278,49 +263,48 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
         // Metoda zmiany zdjęcia
         private void imageChange(String leftImageName, String rightImageName) {
-            if (!isFlipped) {
-                Integer resId = rightImagesMap.get(rightImageName);
-                if (resId != null) {
-                    kotlet.setImageResource(resId);
-                } else {
-                    Log.e("ImageChange", "Nie znaleziono zasobu dla: " + rightImageName);
-                }
-            } else if (isFlipped){
-                Integer resId = leftImagesMap.get(leftImageName);
-                if (resId != null) {
-                    kotlet.setImageResource(resId);
-                } else {
-                    Log.e("ImageChange", "Nie znaleziono zasobu dla: " + leftImageName);
-                }
+            String imageName = isFlipped ? leftImageName : rightImageName;
+            Integer resId = isFlipped ? leftImagesMap.get(imageName) : rightImagesMap.get(imageName);
+
+            if (resId != null) {
+                kotlet.setImageResource(resId);
+            } else {
+                Log.e("ImageChange", "Nie znaleziono zasobu dla: " + imageName);
             }
+
         }
 
         // Mapowanie nazw obrazów dla pierwszej strony kotleta
 
-        private void endGame() {
-            isRunning = false;
+    private void endGame() {
+        isRunning = false;
 
-            velocityX = 0;
-            velocityY = 0;
-            String userResultText = getGoalTextResource(userResult);
-            String goalText = getGoalTextResource(goalLevel);
-            Intent intent = new Intent(this, ResultActivity.class);
-            intent.putExtra("userResult", userResult);
-            intent.putExtra("goalText", goalText);
-            intent.putExtra("userResultText", userResultText);
-
-            startActivity(intent);
-
-            Log.d("GameActivity", "Wywołano endGame()");
-
-            finish();
+        if (userResult < 1 || userResult > 7) {
+            Log.e("GameActivity", "Nieprawidłowy wynik użytkownika: " + userResult);
+            userResult = 0; // Ustaw domyślny wynik na nierówny stopień wysmażenia
         }
 
+        String userResultText = getGoalTextResource(userResult);
 
-        @Override
+        Intent intent = new Intent(this, ResultActivity.class);
+        intent.putExtra("userResult", userResult);
+        intent.putExtra("userResultText", userResultText);
+
+        try {
+            startActivity(intent);
+            Log.d("GameActivity", "Przekazano dane do ResultActivity");
+        } catch (Exception e) {
+            Log.e("GameActivity", "Błąd podczas uruchamiania ResultActivity", e);
+        }
+
+        finish();
+    }
+
+
+    @Override
         public void onAccuracyChanged(Sensor sensor, int accuracy) { }
 
-        // Mapy obrazków dla lewej i prawej strony – jak w Twoim oryginalnym kodzie
+        // Mapy obrazków dla lewej i prawej strony
         private static final Map<String, Integer> leftImagesMap = new HashMap<>();
         static {
             leftImagesMap.put("left_raw", R.drawable.left_raw);
@@ -359,5 +343,5 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                 case 5: return "Very well done!";
                 default: return "Rare";
             }
-        };
+        }
     }

@@ -51,6 +51,7 @@
         android:layout_height="64dp"
         android:layout_marginTop="91dp"
         android:text="I'm ready!"
+        android:backgroundTint="#4C8769"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
