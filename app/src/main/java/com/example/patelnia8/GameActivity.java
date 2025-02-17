@@ -96,13 +96,13 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         }
         private void updateGame() {
 
-            velocityX += roll * 0.002f;
+            velocityX += roll * 0.002f; // im bardziej przechylisz telefon tym szybciej się ześlizguje
             velocityY += -pitch * 0.002f;
 
-            kotlet.setTranslationX(kotlet.getTranslationX() + velocityX);
+            kotlet.setTranslationX(kotlet.getTranslationX() + velocityX); // dzięki temu kotlet się ślizga!
             kotlet.setTranslationY(kotlet.getTranslationY() + velocityY);
 
-            if (!flipCooldown) {
+            if (!flipCooldown) { // kiedy kotlet jest obrócony dodaje się czas smażenia po jednej stronie, kiedy nie, to na drugiej
                 if (!isFlipped) {
                     cookTimeSide2 += 0.01f;
                 } else {
@@ -110,7 +110,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                 }
             }
 
-            if (cookTimeSide1 < 5) {
+            if (cookTimeSide1 < 5) { // breakpointy zmiany obrazu dka lewej strony
                 leftImage = "left_raw";
             }
             if (cookTimeSide1 >= 5 && cookTimeSide1 < 10) {
@@ -125,7 +125,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                 leftImage = "left_congratulations";
             }
 
-            if (cookTimeSide2 < 5) {
+            if (cookTimeSide2 < 5) { // dla prawej
                 rightImage = "right_raw";
             } else if (cookTimeSide2 >= 5 && cookTimeSide2 < 10) {
                 rightImage = "right_rare";
@@ -144,9 +144,9 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
             if (kotlet.getTranslationX() < -240 || kotlet.getTranslationX() > 250 || kotlet.getTranslationY() < -240 || kotlet.getTranslationY() > 230) {
                 endGame();
-            }
+            } // jeśli kotlet wyleci poza obręcz patelni, gra się kończy
         }
-        private void userResultCheck(){
+        private void userResultCheck(){ // sprawdzenie wyniku gracza, musisz mieć obie strony tak samo wysmażone
             if (cookTimeSide1 >= 30 || cookTimeSide2 >= 30) {
                 userResult = 7; // spalasz kotleta na pył
             } else if (cookTimeSide1 >= 25 && cookTimeSide2 >= 25) {
@@ -172,18 +172,19 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                 float x = event.values[0], y = event.values[1], z = event.values[2];
                 float totalAcceleration = (float) Math.sqrt(x * x + y * y + z * z) - 9.81f;
 
-                if (totalAcceleration > 12 && !flipCooldown && !flipTriggered) {
+                if (totalAcceleration > 12 && !flipCooldown && !flipTriggered) { // jeśli kotlet się nie obraca a telefon został podrzucony, wywołuje animację obrotu kotleta
                     animateFlip();
                     flipTriggered = true;
                     flipCooldown = true;
-                    gameHandler.postDelayed(() -> flipCooldown = false, 1000);
+                    gameHandler.postDelayed(() -> flipCooldown = false, 1000); // podczas obrotu kotlet się nie smaży
                 } else if (totalAcceleration < 5) {
                     flipTriggered = false;
                 }
 
             }
 
-            if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
+            if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) { // jeżeli wykryje czujnik obrotu, wykorzysta go i pobierze wartości do zmiennych pitch i roll
+
                 float[] rotationMatrix = new float[9];
                 float[] orientationAngles = new float[3];
 
@@ -198,7 +199,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
             }
         }
 
-        private void animateFlip() {
+        private void animateFlip() { // metoda animacji kotleta
             isRunning = false; // Pauza w grze podczas animacji
 
             // Animacje powiększania, obracania i pomniejszania
@@ -227,7 +228,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
             scaleUpX.start();
             scaleUpY.start();
-            scaleUpX.addListener(new AnimatorListenerAdapter() {
+            scaleUpX.addListener(new AnimatorListenerAdapter() { // kiedy kotlet skończy rosnąć obróci się w połowie znikając z pola widzenia
                 @Override
                 public void onAnimationEnd(Animator animation) {
                     rotateHalf1.start();
@@ -304,7 +305,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     @Override
         public void onAccuracyChanged(Sensor sensor, int accuracy) { }
 
-        // Mapy obrazków dla lewej i prawej strony
+        // Mapy obrazków, tekstu dla lewej i prawej strony + wyniki
         private static final Map<String, Integer> leftImagesMap = new HashMap<>();
         static {
             leftImagesMap.put("left_raw", R.drawable.left_raw);
