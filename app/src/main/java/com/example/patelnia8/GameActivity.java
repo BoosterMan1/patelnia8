@@ -40,7 +40,8 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         private int goalLevel;
 
         private Button endButton;
-        private int userResult;
+        private int userResultLeft, userResultRight;
+        public int userResult;
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
@@ -49,13 +50,12 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
             endButton = findViewById(R.id.end_cooking_button);
             endButton.setOnClickListener(v -> {
-                endGame();
-                Intent intent = new Intent(this, ResultActivity.class);
-                startActivity(intent);
+                goToResult();
+
             });
 
+            goalLevel = getIntent().getIntExtra("goalLevel", 0);
 
-            goalLevel = getIntent().getIntExtra("goalLevel", 1);
             kotlet = findViewById(R.id.steak);
             endButton = findViewById(R.id.end_cooking_button);
 
@@ -104,67 +104,69 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
             if (!flipCooldown) { // kiedy kotlet jest obrócony dodaje się czas smażenia po jednej stronie, kiedy nie, to na drugiej
                 if (!isFlipped) {
-                    cookTimeSide2 += 0.01f;
+                    cookTimeSide2 += 0.02f;
                 } else {
-                    cookTimeSide1 += 0.01f;
+                    cookTimeSide1 += 0.02f;
                 }
             }
 
             if (cookTimeSide1 < 5) { // breakpointy zmiany obrazu dka lewej strony
                 leftImage = "left_raw";
-            }
-            if (cookTimeSide1 >= 5 && cookTimeSide1 < 10) {
+                userResultLeft = 1;
+            } else if (cookTimeSide1 >= 5 && cookTimeSide1 < 10) {
                 leftImage = "left_rare";
+                userResultLeft = 2;
             } else if (cookTimeSide1 >= 10 && cookTimeSide1 < 15) {
                 leftImage = "left_medium_rare";
+                userResultLeft = 3;
             } else if (cookTimeSide1 >= 15 && cookTimeSide1 < 20) {
                 leftImage = "left_medium_well";
+                userResultLeft = 4;
             } else if (cookTimeSide1 >= 20 && cookTimeSide1 < 25) {
                 leftImage = "left_well_done";
+                userResultLeft = 5;
             } else if (cookTimeSide1 >= 25 && cookTimeSide1 < 30){
                 leftImage = "left_congratulations";
+                userResultLeft = 6;
+            } else {
+                userResult = 7;
             }
 
             if (cookTimeSide2 < 5) { // dla prawej
                 rightImage = "right_raw";
+                userResultRight = 1;
             } else if (cookTimeSide2 >= 5 && cookTimeSide2 < 10) {
                 rightImage = "right_rare";
+                userResultRight = 2;
             } else if (cookTimeSide2 >= 10 && cookTimeSide2 < 15) {
                 rightImage = "right_medium_rare";
+                userResultRight = 3;
             } else if (cookTimeSide2 >= 15 && cookTimeSide2 < 20) {
                 rightImage = "right_medium_well";
+                userResultRight = 4;
             } else if (cookTimeSide2 >= 20 && cookTimeSide2 < 25) {
                 rightImage = "right_well_done";
+                userResultRight = 5;
             } else if (cookTimeSide2 >= 25 && cookTimeSide2 < 30){
                 rightImage = "right_congratulations";
+                userResultRight = 6;
+            } else{
+                userResult = 7;
             }
-
-            userResultCheck();
+            if (userResult == 7){
+                leftImage = "left_fire";
+                rightImage = "right_fire";
+                imageChange(leftImage, rightImage);
+            }else if (userResultLeft == userResultRight){
+                userResult = userResultLeft;
+            }else{
+                userResult = 0;
+            }
 
 
             if (kotlet.getTranslationX() < -240 || kotlet.getTranslationX() > 250 || kotlet.getTranslationY() < -240 || kotlet.getTranslationY() > 230) {
-                endGame();
-            } // jeśli kotlet wyleci poza obręcz patelni, gra się kończy
-        }
-        private void userResultCheck(){ // sprawdzenie wyniku gracza, musisz mieć obie strony tak samo wysmażone
-            if (cookTimeSide1 >= 30 || cookTimeSide2 >= 30) {
-                userResult = 7; // spalasz kotleta na pył
-            } else if (cookTimeSide1 >= 25 && cookTimeSide2 >= 25) {
-                userResult = 6; // congratulations - very well done
-            } else if (cookTimeSide1 >= 20 && cookTimeSide2 >= 20) {
-                userResult = 5; // well done
-            } else if (cookTimeSide1 >= 15 && cookTimeSide2 >= 15) {
-                userResult = 4; // medium well
-            } else if (cookTimeSide1 >= 10 && cookTimeSide2 >= 10) {
-                userResult = 3; // medium rare
-            } else if (cookTimeSide1 >= 5 && cookTimeSide2 >= 5) {
-                userResult = 2; // rare
-            } else if (cookTimeSide1 < 5 && cookTimeSide2 < 5){
-                userResult = 1; // raw
-            }else{
-                userResult = 0; // nierówny stopień wysmażenia
-            }
-
+                gameOver();
+            } // jeśli kotlet wyleci poza obręcz patelni, gra się kończy przegraną
         }
         @Override
         public void onSensorChanged(SensorEvent event) {
@@ -239,7 +241,8 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
             rotateHalf1.addListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                    imageChange(leftImage, rightImage);
+                        imageChange(leftImage, rightImage);
+
                     kotlet.setRotationY(-90f);
                     rotateHalf2.start();
                 }
@@ -264,8 +267,10 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
         // Metoda zmiany zdjęcia
         private void imageChange(String leftImageName, String rightImageName) {
+
             String imageName = isFlipped ? leftImageName : rightImageName;
             Integer resId = isFlipped ? leftImagesMap.get(imageName) : rightImagesMap.get(imageName);
+
 
             if (resId != null) {
                 kotlet.setImageResource(resId);
@@ -275,33 +280,29 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
         }
 
-        // Mapowanie nazw obrazów dla pierwszej strony kotleta
 
-    private void endGame() {
-        isRunning = false;
 
-        if (userResult < 1 || userResult > 7) {
-            Log.e("GameActivity", "Nieprawidłowy wynik użytkownika: " + userResult);
-            userResult = 0; // Ustaw domyślny wynik na nierówny stopień wysmażenia
-        }
+    private void goToResult() {
 
-        String userResultText = getGoalTextResource(userResult);
+        isRunning = false; // Zatrzymywanie oświeżania gierki
+        sensorManager.unregisterListener(this); // Wyłączenie czujników
+        gameHandler.removeCallbacksAndMessages(null); // Zatrzymuje pętlę gry
 
-        Intent intent = new Intent(this, ResultActivity.class);
-        intent.putExtra("userResult", userResult);
-        intent.putExtra("userResultText", userResultText);
-
-        try {
-            startActivity(intent);
-            Log.d("GameActivity", "Przekazano dane do ResultActivity");
-        } catch (Exception e) {
-            Log.e("GameActivity", "Błąd podczas uruchamiania ResultActivity", e);
-        }
-
+        Intent resultIntent = new Intent(this, ResultActivity.class);
+        resultIntent.putExtra("userResult", userResult);
+        resultIntent.putExtra("goalLevel", goalLevel);
+        startActivity(resultIntent);
         finish();
     }
+    private void gameOver(){
+            isRunning = false;
 
+            Intent loseIntent = new Intent(GameActivity.this, LoseActivity.class);
+            startActivity(loseIntent); // przechodzenie do ekranu przegranej
+            finish();
+    }
 
+    // Mapowanie nazw obrazów dla pierwszej i drugiej strony kotleta + tekst i wyniki
     @Override
         public void onAccuracyChanged(Sensor sensor, int accuracy) { }
 
@@ -314,7 +315,10 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
             leftImagesMap.put("left_medium_well", R.drawable.left_medium_well);
             leftImagesMap.put("left_well_done", R.drawable.left_well_done);
             leftImagesMap.put("left_congratulations", R.drawable.left_congratulations);
+            leftImagesMap.put("left_fire", R.drawable.left_fire);
         }
+
+
 
         private static final Map<String, Integer> rightImagesMap = new HashMap<>();
         static {
@@ -324,25 +328,8 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
             rightImagesMap.put("right_medium_well", R.drawable.right_medium_well);
             rightImagesMap.put("right_well_done", R.drawable.right_well_done);
             rightImagesMap.put("right_congratulations", R.drawable.right_congratulations);
+            rightImagesMap.put("right_fire", R.drawable.right_fire);
         }
-        private static final Map<Integer, Integer> resultImagesMap = new HashMap<>();
-        static {
-            resultImagesMap.put(1, R.drawable.raw_result);
-            resultImagesMap.put(2, R.drawable.rare_result);
-            resultImagesMap.put(3, R.drawable.medium_rare_result);
-            resultImagesMap.put(4, R.drawable.medium_well_result);
-            resultImagesMap.put(5, R.drawable.well_done_result);
-            resultImagesMap.put(6, R.drawable.congratulations_result);
-            resultImagesMap.put(7, R.drawable.dust);
-        }
-        private String getGoalTextResource(int level) {
-            switch (level) {
-                case 1: return "Rare";
-                case 2: return "Medium rare";
-                case 3: return "Medium well";
-                case 4: return "Well done";
-                case 5: return "Very well done!";
-                default: return "Rare";
-            }
-        }
+
+
     }

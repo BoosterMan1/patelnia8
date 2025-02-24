@@ -10,11 +10,13 @@
 
     <Button
         android:id="@+id/end_cooking_button"
-        android:layout_width="177dp"
-        android:layout_height="63dp"
+        android:layout_width="258dp"
+        android:layout_height="70dp"
         android:layout_marginTop="75dp"
         android:backgroundTint="#4C8769"
-        android:text="Zakończ smażenie"
+        android:text="Check the results"
+        android:textColor="@color/white"
+        android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/patelnia" />
@@ -45,11 +47,26 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="90dp"
-        android:layout_marginTop="96dp"
+        android:layout_marginTop="40dp"
         android:layout_marginEnd="91dp"
-        android:text="Obracaj/Podrzucaj urządzeniem!"
+        android:text="Toss your device to flip the steak"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.486"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView9"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="90dp"
+        android:layout_marginTop="92dp"
+        android:layout_marginEnd="91dp"
+        android:text="Cook it on both sides equally to pass"
+        android:textSize="17sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.486"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

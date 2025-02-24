@@ -7,7 +7,7 @@
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
+        android:label="Slippery steak"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Patelnia8"
@@ -21,9 +21,20 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".GoalActivity" />
-        <activity android:name=".GameActivity"/>
-        <activity android:name=".ResultActivity"/>
+        <activity
+            android:name=".GoalActivity">
+        </activity>
+        <activity
+            android:name=".GameActivity">
+        </activity>
+        <activity
+            android:name=".ResultActivity">
+
+        </activity>
+        <activity
+            android:name=".LoseActivity">
+
+        </activity>
     </application>
 
 </manifest>

@@ -10,21 +10,50 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="175dp"
-        android:layout_marginTop="128dp"
+        android:layout_marginTop="184dp"
         android:layout_marginEnd="207dp"
-        android:text="Steak cook level goal:"
-        android:textSize="24sp"
+        android:text="Cook your steak to level:"
+        android:textColor="@color/black"
+        android:textSize="28sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.422"
+        app:layout_constraintHorizontal_bias="0.448"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/goal_button"
+        android:layout_width="184dp"
+        android:layout_height="64dp"
+        android:layout_marginTop="44dp"
+        android:backgroundTint="#4C8769"
+        android:text="Ready!"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/goal_image" />
+
+    <TextView
+        android:id="@+id/goal_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="166dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="166dp"
+        android:text="Medium rare"
+        android:textColor="@color/black"
+        android:textSize="25sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
 
     <ImageView
         android:id="@+id/goal_image"
         android:layout_width="294dp"
         android:layout_height="174dp"
         android:layout_marginStart="37dp"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="52dp"
         android:layout_marginEnd="37dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.488"
@@ -33,28 +62,15 @@
         app:srcCompat="@drawable/medium_rare_result" />
 
     <TextView
-        android:id="@+id/goal_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="166dp"
-        android:layout_marginTop="47dp"
-        android:layout_marginEnd="166dp"
-        android:text="Medium rare"
-        android:textSize="20sp"
+        android:id="@+id/textView8"
+        android:layout_width="355dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="100dp"
+        android:text="Hold your device horizontally"
+        android:textColor="@color/black"
+        android:textSize="25dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
-
-    <Button
-        android:id="@+id/goal_start_button"
-        android:layout_width="184dp"
-        android:layout_height="64dp"
-        android:layout_marginTop="91dp"
-        android:text="I'm ready!"
-        android:backgroundTint="#4C8769"
-        android:textSize="20sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/goal_image" />
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

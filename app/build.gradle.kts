@@ -33,6 +33,9 @@ android {
 
 dependencies {
 
+    implementation("io.coil-kt:coil:2.2.2") // Podstawowa obsługa obrazów
+    implementation("io.coil-kt:coil-gif:2.2.2") // Obsługa GIF-ów
+
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)

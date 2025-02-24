@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "patelnia8"
+rootProject.name = "Slippery steak"
 include(":app")
  
